@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TOMZFOOD&DRINK - Full App (with WA chat)</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    :root { --accent:#ee4d2d; --wa:#25D366; }
+    body { margin:0; padding:0; background:#090909; font-family:Arial, sans-serif; color:#222; }
+    .box-area { background:#000; width:360px; margin:auto; margin-top:60px; padding:20px; border-radius:12px; color:#fff; }
+    .input-group input { background:#333; border:none; color:white; }
+    .btn-login, .btn-register { background:gold; border:none; width:100%; padding:10px; border-radius:6px; font-weight:bold; margin-top:10px; }
+
+    header { background:#fff; position:sticky; top:0; z-index:50; }
+    .hero { height:60vh; background:#222 url('') center/cover no-repeat; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-align:center; }
+    .hero .btn { background:#ffc107; padding:10px 25px; border-radius:25px; color:black; font-weight:bold; }
+
+    .menu-section { background:#fff; text-align:center; padding:40px 20px; }
+    .menu-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; max-width:1000px; margin:auto; }
+    .menu-item { background:#fafafa; padding:14px; border-radius:12px; box-shadow:0 3px 8px rgba(0,0,0,0.08); text-align:left; }
+    .menu-item img { width:100%; height:160px; object-fit:cover; border-radius:10px; }
+    .btn-beli { background:var(--wa); color:#fff; padding:10px 20px; border-radius:6px; display:inline-block; text-decoration:none; margin-top:10px; font-weight:bold; border:none; cursor:pointer; }
+
+    .checkout-container { max-width:600px; margin:30px auto; background:#fff; border-radius:12px; padding-bottom:20px; }
+    .checkout-header { background:var(--accent); color:white; padding:15px; font-size:20px; text-align:center; border-radius:12px 12px 0 0; }
+    .section { padding:15px; border-bottom:1px solid #eee; }
+    input, textarea, select { width:100%; padding:10px; margin-top:5px; border-radius:8px; border:1px solid #ccc; }
+    .summary { padding:15px; background:#fff7f5; border-radius:0 0 12px 12px; }
+    .summary div { display:flex; justify-content:space-between; margin:6px 0; }
+    button, .btn-wa { width:100%; padding:12px; border:none; border-radius:8px; font-size:16px; font-weight:bold; margin-top:10px; cursor:pointer; }
+
+    #infoSection { background-color: #f8f5f0; color: #5a3210; text-align: center; padding:40px; }
+    #infoSection h1 { color: #6b3e26; }
+    #infoSection table { margin: 20px auto; border-collapse: collapse; width: 80%; max-width: 700px; background:#fff; border-radius:8px; overflow:hidden; }
+    #infoSection td { border-bottom: 1px solid #eee; padding: 12px 16px; text-align: left; }
+    #infoSection .status { background-color: #fff5e6; display: inline-block; padding: 10px 20px; border-radius: 10px; margin-top: 15px; font-weight: bold; }
+    .btn-custom { display: inline-block; margin-top: 18px; background-color: #8b4513; color: white; text-decoration: none; padding: 10px 25px; border-radius: 8px; border:none; cursor:pointer; }
+    .btn-custom:hover { background-color: #a0522d; }
+
+    .wa-float { position:fixed; right:18px; bottom:18px; z-index:9999; width:56px; height:56px; border-radius:50%; background:var(--wa); display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,.25); cursor:pointer; }
+    .wa-float img { width:34px; height:34px; }
+
+    @media (max-width:600px){
+      .box-area { width: 92%; margin-top:30px; }
+      .hero { height:45vh; padding: 20px; }
+      #infoSection table { width: 95%; }
+      .checkout-container { margin:12px; }
+    }
+
+    .hidden { display:none !important; } /* untuk search */
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<section id="loginSection">
+  <div class="box-area">
+    <h2 class="text-center">Login</h2>
+    <div class="input-group mb-3"><input id="loginUsername" class="form-control" placeholder="Nama"></div>
+    <div class="input-group"><input type="password" id="loginPassword" class="form-control" placeholder="Password"></div>
+    <button class="btn-login" onclick="login()">Login</button>
+    <div class="text-center mt-2">Belum punya akun? <span style="color:gold;cursor:pointer;" onclick="showRegister()">Daftar</span></div>
+  </div>
+</section>
+
+<!-- REGISTER -->
+<section id="registerSection" style="display:none;">
+  <div class="box-area">
+    <h2 class="text-center">Register</h2>
+    <div class="input-group mb-3"><input id="registerUsername" class="form-control" placeholder="Nama"></div>
+    <div class="input-group mb-3"><input id="registerEmail" class="form-control" placeholder="Email"></div>
+    <div class="input-group mb-3"><input type="password" id="registerPassword" class="form-control" placeholder="Password"></div>
+    <button class="btn-register" onclick="register()">Simpan Akun</button>
+    <div class="text-center mt-2">Sudah punya akun? <span style="color:gold;cursor:pointer;" onclick="showLogin()">Login</span></div>
+  </div>
+</section>
+
+<!-- BERANDA -->
+<section id="berandaSection" style="display:none;">
+  <header>
+    <nav class="navbar navbar-dark bg-dark p-3">
+      <div class="container-fluid">
+        <span class="navbar-brand">Toko TOMZ</span>
+        <button class="btn btn-warning" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>Selamat Datang di Toko TOMZ</h1>
+    <p>Makanan enak dan terjangkau setiap hari</p>
+    <button class="btn" onclick="goMenu()">Lihat Menu</button>
+  </div>
+</section>
+
+<!-- Informasi Pengantaran - Beranda -->
+<div style="
+  margin-top:15px; 
+  padding:15px; 
+  background:#ffffff; 
+  border:2px solid #ff9800; 
+  border-radius:12px; 
+  text-align:center; 
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+">
+  <h4 style="margin:0 0 8px 0; font-size:17px; font-weight:bold; color:#e65100;">
+    Informasi Pengantaran
+  </h4>
+  <div class="delivery-info" style="text-align:center; margin-top:20px; font-size:1.2rem; font-weight:600;">
+  Pengantaran: Senin–Jum'at 17:15–20:00 • Sabtu–Minggu 07:00–20:00
+</div>
+
+</div>
+
+
+
+<!-- MENU -->
+<section id="menuSection" style="display:none;">
+  <div class="menu-section">
+    <h2>Menu Kami</h2>
+    <p>Pilih makanan dan langsung beli</p>
+
+    <!-- INPUT SEARCH -->
+    <input id="searchInput" type="text" class="form-control mb-3" placeholder="Cari menu...">
+
+    <div class="menu-container" id="menuContainer"></div>
+    <button class="btn btn-primary mt-3" onclick="goAddMenu()">Tambah Menu</button>
+    <button class="btn btn-secondary mt-4" onclick="goBeranda()">Kembali</button>
+  </div>
+</section>
+
+<!-- TAMBAH MENU -->
+<section id="addMenuSection" style="display:none;">
+  <div class="menu-section">
+    <h2>Tambah Menu Baru</h2>
+    <div class="container" style="max-width:400px;">
+      <label>Nama Menu</label>
+      <input id="newMenuName" class="form-control mb-2" placeholder="Contoh: Martabak Mini">
+
+      <label>Harga</label>
+      <input id="newMenuPrice" type="number" class="form-control mb-2" placeholder="Harga (angka)">
+
+      <label>URL Gambar</label>
+      <input id="newMenuImage" class="form-control mb-3" placeholder="Link gambar (optional)">
+
+      <button class="btn btn-success w-100" onclick="saveMenu()">Simpan Menu</button>
+      <button class="btn btn-secondary w-100 mt-2" onclick="kembaliDariAddMenu()">Kembali</button>
+    </div>
+  </div>
+</section>
+
+<!-- CHECKOUT -->
+<section id="checkoutSection" style="display:none;">
+  <div class="checkout-container">
+    <div class="checkout-header">Checkout</div>
+
+    <div class="section">
+      <label>Nama Penerima</label>
+      <input id="name" class="form-control" placeholder="Nama lengkap">
+      <label>Email</label>
+      <input id="Email" class="form-control" placeholder="email@domain.com">
+      <label>Alamat</label>
+      <textarea id="address" rows="3" class="form-control" placeholder="Alamat lengkap"></textarea>
+      <label>No. Telepon</label>
+      <input id="phone" class="form-control" placeholder="0812xxxx">
+    </div>
+
+    <div class="section">
+      <label>Produk</label>
+      <input id="product" class="form-control" readonly>
+      <label>Jumlah</label>
+      <input type="number" id="quantity" class="form-control" value="1" min="1" oninput="calculateTotal()">
+      <label>Harga per item (angka)</label>
+      <input id="price" class="form-control" readonly>
+    </div>
+
+    <div class="section">
+      <label>Metode Pembayaran</label>
+      <select id="payment" class="form-control">
+        <option value="">Pilih</option>
+        <option value="COD">COD</option>
+        <option value="Transfer Bank">Transfer Bank</option>
+        <option value="Dana">Dana</option>
+        <option value="Gopay">Gopay</option>
+        <option value="ShopeePay">ShopeePay</option>
+      </select>
+    </div>
+
+    <div class="summary">
+      <div><span>Subtotal</span><span id="subtotal">Rp0</span></div>
+      <div><span>Ongkir</span><span id="shipping">Rp0</span></div>
+      <div><strong>Total</strong><strong id="total">Rp0</strong></div>
+
+      <button class="btn btn-warning" onclick="calculateTotal()">Hitung Total</button>
+      <button class="btn btn-success mt-2" onclick="bayar()">Bayar Sekarang</button>
+      <button class="btn btn-secondary mt-2" onclick="goMenu()">Kembali</button>
+    </div>
+  </div>
+</section>
+
+<!-- INFORMASI PEMBAYARAN -->
+<section id="infoSection" style="display:none; padding:20px;">
+  <h1>Informasi Pembayaran</h1>
+
+  <table>
+    <tr><td><strong>Nama</strong></td><td id="infoNama"></td></tr>
+    <tr><td><strong>Email</strong></td><td id="infoEmail"></td></tr>
+    <tr><td><strong>Alamat</strong></td><td id="infoAlamat"></td></tr>
+    <tr><td><strong>No. Telepon</strong></td><td id="infoTelepon"></td></tr>
+    <tr><td><strong>Metode Pembayaran</strong></td><td id="infoPembayaran"></td></tr>
+    <tr><td><strong>Produk</strong></td><td id="infoProduk"></td></tr>
+    <tr><td><strong>Subtotal</strong></td><td id="infoSubtotal"></td></tr>
+    <tr><td><strong>Ongkir</strong></td><td id="infoOngkir"></td></tr>
+    <tr><td><strong>Total</strong></td><td id="infoTotal"></td></tr>
+  </table>
+
+  <div class="status">Menunggu Pembayaran</div>
+  <button id="btnContactWa" class="btn-custom" style="background:var(--wa); border:none; color:white; margin-top:18px;">
+    Hubungi via WhatsApp
+  </button>
+
+  <br/>
+  <button class="btn-custom" onclick="goMenu()">Kembali ke Menu</button>
+</section>
+
+<!-- floating WA chat -->
+<div class="wa-float" id="waFloat" title="Chat via WhatsApp">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA">
+</div>
+
+<script>
+const NOMOR_WA = "+62895343287264";
+
+/* Sections */
+const loginSection = document.getElementById("loginSection");
+const registerSection = document.getElementById("registerSection");
+const berandaSection = document.getElementById("berandaSection");
+const menuSection = document.getElementById("menuSection");
+const addMenuSection = document.getElementById("addMenuSection");
+const checkoutSection = document.getElementById("checkoutSection");
+const infoSection = document.getElementById("infoSection");
+
+function hideAll() {
+  [loginSection, registerSection, berandaSection, menuSection, addMenuSection, checkoutSection, infoSection].forEach(s=>s.style.display='none');
+}
+
+if(localStorage.getItem('loggedInUser')){
+  hideAll();
+  berandaSection.style.display='block';
+} else {
+  hideAll();
+  loginSection.style.display='block';
+}
+
+function showRegister(){ hideAll(); registerSection.style.display='block'; }
+function showLogin(){ hideAll(); loginSection.style.display='block'; }
+
+function register(){
+  const username = document.getElementById('registerUsername').value.trim();
+  const email = document.getElementById('registerEmail').value.trim();
+  const password = document.getElementById('registerPassword').value;
+  if(!username || !email || !password){ alert('Isi semua data!'); return; }
+  let user = { username,email,password };
+  localStorage.setItem('user',JSON.stringify(user));
+  alert('Akun dibuat! Silakan login.');
+  showLogin();
+}
+
+function login(){
+  const saved = JSON.parse(localStorage.getItem('user') || 'null');
+  if(!saved){ alert('Belum ada akun. Silakan daftar.'); return; }
+  if(saved.username===document.getElementById('loginUsername').value && saved.password===document.getElementById('loginPassword').value){
+    localStorage.setItem('loggedInUser', saved.username);
+    hideAll();
+    berandaSection.style.display='block';
+  } else alert('Username atau password salah.');
+}
+
+function logout(){ localStorage.removeItem('loggedInUser'); hideAll(); loginSection.style.display='block'; }
+
+/* Menus */
+let defaultMenus = [
+  {nama:'Martabak Mini',harga:3000,gambar:"https://vui.unsplash.com/resize?height=256&quality=60&type=auto&url=https%3A%2F%2Fsearched-images.s3.us-west-2.amazonaws.com%2F9bf25656-8155-4122-bf14-d7754f0af104%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Credential%3DAKIAQ4GRIA4QQ7L7GEOH%252F20251203%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20251203T073231Z%26X-Amz-Expires%3D86400%26X-Amz-SignedHeaders%3Dhost%26X-Amz-Signature%3Dffdb4fe90394cbd866f1933ea0d21de09c2e9314d34baf9cf62f16597ad2ad42&sign=6W5TEVVVCwL76YcpyAbvqaDi3iEyF6udMFp1MnDcsww"},
+  {nama:'Pisang Coklat',harga:3000,gambar:"https://vui.unsplash.com/resize?height=256&quality=60&type=auto&url=https%3A%2F%2Fsearched-images.s3.us-west-2.amazonaws.com%2F0e0d4cba-969f-4f59-8f02-86522497e5db%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Credential%3DAKIAQ4GRIA4QQ7L7GEOH%252F20251203%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20251203T073344Z%26X-Amz-Expires%3D86400%26X-Amz-SignedHeaders%3Dhost%26X-Amz-Signature%3D0fb1ef81111e9bcc138000c958a9f3521ab2f4a734d0450d26cbe28d7d952249&sign=gNXZFKvIFGKnWlTLFHO9aR_FmHybAMsV4qokPEcuVUw"},
+  {nama:'Sosis Bakar',harga:8000,gambar:"https://vui.unsplash.com/resize?height=256&quality=60&type=auto&url=https%3A%2F%2Fsearched-images.s3.us-west-2.amazonaws.com%2F9b8b2fc4-9077-4af0-9abb-14d6949aa6e4%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Credential%3DAKIAQ4GRIA4QQ7L7GEOH%252F20251203%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20251203T073456Z%26X-Amz-Expires%3D86400%26X-Amz-SignedHeaders%3Dhost%26X-Amz-Signature%3D75faffcd9751fcfb8528c1fb5fe6390100f3a4c67b4fba136b9382c81306c2b1&sign=GIuyUHr8_hdNWkrIwFdS6BMvIAwlfARMejPNfxbD_e0"},
+  {nama:'Kebab Mini',harga:10000,gambar:"https://vui.unsplash.com/resize?height=256&quality=60&type=auto&url=https%3A%2F%2Fsearched-images.s3.us-west-2.amazonaws.com%2F6a0fabbb-572a-4027-b067-71e01cea9fcd%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Credential%3DAKIAQ4GRIA4QQ7L7GEOH%252F20251203%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20251203T073553Z%26X-Amz-Expires%3D86400%26X-Amz-SignedHeaders%3Dhost%26X-Amz-Signature%3Df0173525dace80e4c0ba25cbba64cef00ac57a56eeea92049875055384a6dc96&sign=J_j0d3DkWX3UflkTlhNvZlxaVKuph0tT3LipNSVQqoo"},
+  {nama:'Roti Bakar',harga:12000,gambar:"https://vui.unsplash.com/resize?height=256&quality=60&type=auto&url=https%3A%2F%2Fsearched-images.s3.us-west-2.amazonaws.com%2F0e223ac4-1688-4533-b245-25c4c3b3568e%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Credential%3DAKIAQ4GRIA4QQ7L7GEOH%252F20251203%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20251203T073649Z%26X-Amz-Expires%3D86400%26X-Amz-SignedHeaders%3Dhost%26X-Amz-Signature%3De4b943a84233374c32b43f4ed3baedc7cf3c41c4f9baa872a4e033d30c135f50&sign=N81TZET2lKKJ-qG127uKlzWdg-JOlG1d_bPvxz0Pk20"},
+];
+
+const menuContainer = document.getElementById('menuContainer');
+
+function getExtraMenus(){ return JSON.parse(localStorage.getItem('extraMenus') || '[]'); }
+
+function renderMenu(){
+  menuContainer.innerHTML='';
+  [...defaultMenus,...getExtraMenus()].forEach((m,i)=>{
+  const div = document.createElement('div');
+  div.className = 'menu-item';
+  div.innerHTML = `
+    <img src="${m.gambar}" alt="${m.nama}">
+    <h3>${m.nama}</h3>
+    <p>Rp${m.harga.toLocaleString('id-ID')}</p>
+    <button class='btn-beli' onclick="beliProduk('${m.nama}', ${m.harga})">BELI</button>
+    ${i >= defaultMenus.length ? `<button class='btn btn-danger mt-2' onclick="hapusMenu(${i - defaultMenus.length})">HAPUS</button>` : ''}
+  `;
+  menuContainer.appendChild(div);
+});
+}
+/* Navigation helpers */
+function goMenu(){ hideAll(); menuSection.style.display='block'; renderMenu(); attachSearch(); }
+function goBeranda(){ hideAll(); berandaSection.style.display='block'; }
+function goAddMenu(){ hideAll(); addMenuSection.style.display='block'; }
+function kembaliDariAddMenu(){ goMenu(); }
+
+/* Add / Save Menu */
+function saveMenu(){
+  const name=(document.getElementById('newMenuName').value||'').trim();
+  const price=Number(document.getElementById('newMenuPrice').value||0);
+  const image=(document.getElementById('newMenuImage').value||'').trim()||"https://via.placeholder.com/400x300?text=No+Image";
+  if(!name||!price){ alert('Isi nama dan harga!'); return; }
+  const extra=getExtraMenus(); extra.push({nama:name,harga:price,gambar:image});
+  localStorage.setItem('extraMenus', JSON.stringify(extra));
+  alert('Menu ditambahkan!');
+  goMenu();
+}
+
+/* Checkout */
+function beliProduk(nama,harga){
+  hideAll();
+  checkoutSection.style.display='block';
+  document.getElementById('product').value=nama;
+  document.getElementById('price').value=harga;
+  document.getElementById('quantity').value=1;
+  calculateTotal();
+}
+
+function calculateTotal(){
+  const qty=Number(document.getElementById('quantity').value);
+  const harga=Number(document.getElementById('price').value);
+  const subtotal=qty*harga;
+  const ongkir=3000;
+  document.getElementById('subtotal').textContent=`Rp${subtotal.toLocaleString('id-ID')}`;
+  document.getElementById('shipping').textContent=`Rp${ongkir.toLocaleString('id-ID')}`;
+  document.getElementById('total').textContent=`Rp${(subtotal+ongkir).toLocaleString('id-ID')}`;
+}
+
+/* Bayar */
+function bayar(){
+  const data = {
+    nama: document.getElementById('name').value,
+    email: document.getElementById('Email').value,
+    alamat: document.getElementById('address').value,
+    telepon: document.getElementById('phone').value,
+    pembayaran: document.getElementById('payment').value, // ambil dari select
+    produk: document.getElementById('product').value,
+    subtotal: document.getElementById('subtotal').textContent,
+    ongkir: document.getElementById('shipping').textContent,
+    total: document.getElementById('total').textContent
+};
+  Object.keys(data).forEach(k=>{
+    const el = document.getElementById('info'+capitalizeFirstLetter(k));
+    if(el) el.textContent=data[k];
+  });
+  hideAll(); infoSection.style.display='block';
+}
+
+
+function capitalizeFirstLetter(str){ return str.charAt(0).toUpperCase()+str.slice(1); }
+
+/* WA contact */
+document.getElementById('waFloat').onclick = ()=>{ window.open(`https://wa.me/+62895343287264`, '_blank'); };
+document.getElementById('btnContactWa').onclick = ()=>{ window.open(`https://wa.me/+62895343287264`, '_blank'); };
+
+/* SEARCH fix */
+function attachSearch(){
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', () => {
+    const key = searchInput.value.toLowerCase();
+    const menuItems = menuContainer.querySelectorAll('.menu-item');
+    menuItems.forEach(i=>{
+      i.querySelector('h3').textContent.toLowerCase().includes(key)
+        ? i.classList.remove('hidden')
+        : i.classList.add('hidden');
+    });
+  });
+}
+function hapusMenu(index){
+  if(confirm('Yakin ingin menghapus menu ini?')){
+    const extra = getExtraMenus();
+    extra.splice(index, 1);
+    localStorage.setItem('extraMenus', JSON.stringify(extra));
+    renderMenu();
+  }
+}
+
+</script>
+
+
+</body>
+</html>
