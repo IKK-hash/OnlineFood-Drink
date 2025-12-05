@@ -414,41 +414,6 @@ function hapusMenu(index){
 
 </script>
 
-<script>
-  function kirimWA() {
-    // AMBIL DATA FORM
-    var nama = document.getElementById("namaCustomer").value;
-    var alamat = document.getElementById("alamatCustomer").value;
-    var catatan = document.getElementById("catatanCustomer").value;
-    var total = document.getElementById("totalCheckout").innerText;
-
-    // PRODUK YANG DIPESAN
-    var itemList = [];
-    document.querySelectorAll('.checkout-item').forEach(function(el){
-      itemList.push("- " + el.innerText.trim());
-    });
-    var itemText = itemList.join("%0A");
-
-    // NOMOR WA ANDA
-    var nomorAdmin = "6281234567890"; // GANTI DENGAN NOMOR ANDA
-
-    // FORMAT PESAN
-    var pesan =
-      "📦 *PESANAN BARU MASUK* %0A%0A" +
-      "*Nama:* " + nama + "%0A" +
-      "*Alamat:* " + alamat + "%0A" +
-      "*Catatan:* " + catatan + "%0A%0A" +
-      "🛒 *Produk:* %0A" + itemText + "%0A%0A" +
-      "💰 *Total:* " + total + "%0A%0A" +
-      "Mohon untuk segera diproses 🙏";
-
-    // BUKA WHATSAPP
-    var waURL = "https://wa.me/+62895343287264" + nomorAdmin + "?text=" + pesan;
-
-    window.open(waURL, "_blank");
-  }
-</script>
-
 
 </body>
 </html>
